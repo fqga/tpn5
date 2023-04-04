@@ -137,7 +137,9 @@ typedef struct board_s
 /* === Public variable declarations ============================================================ */
 
 /* === Public function declarations ============================================================ */
+board_t BoardCreate(void);
 
+void SisTick_Init(uint16_t ticks);
 /* === End of documentation ==================================================================== */
 
 #ifdef __cplusplus

@@ -117,6 +117,25 @@ void DisplayWriteBCD( display_t display, uint8_t * number, uint8_t size);
  */
 void DisplayRefresh(display_t display);
 
+/**
+ * @brief Función para hacer parpadear digitos de la pantalla
+ * 
+ * @param display   Puntero al descriptor de la pantalla que se quiere utilizar
+ * @param from      Posición del primer dígito que se quiere hacer parpadear
+ * @param to        Posición del último dígito que se quiere hacer parpadear
+ * @param frequency Factor de división de la frecuencia de refresco para el parpadeo
+ */
+void DisplayFlashDigits(display_t display, uint8_t from, uint8_t to, uint16_t frequency);
+
+/**
+ * @brief Función para cambiar el estado de los puntos de los digitos en la pantalla
+ * 
+ * @param display   Puntero al descriptor de la pantalla que se quiere utilizar
+ * @param from      Posición del primer dígito que se quiere cambiar el punto
+ * @param to        Posición del último dígito que se quiere cambiar el punto
+ */
+void DisplayToggleDots(display_t display, uint8_t from, uint8_t to);
+
 /* === Declaraciones de funciones publicas ================================= */
 
 /* === Ciere de documentacion ============================================== */

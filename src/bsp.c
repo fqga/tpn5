@@ -131,10 +131,10 @@ void KeysInit(void){
     board.set_alarm = DigitalInputCreate(KEY_F2_GPIO, KEY_F2_BIT, false);
 
     Chip_SCU_PinMuxSet(KEY_F3_PORT, KEY_F3_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F3_FUNC);
-    board.decrement = DigitalInputCreate(KEY_F3_GPIO, KEY_F3_BIT, false);
+    board.increment = DigitalInputCreate(KEY_F3_GPIO, KEY_F3_BIT, false);
 
     Chip_SCU_PinMuxSet(KEY_F4_PORT, KEY_F4_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_F4_FUNC);
-    board.increment = DigitalInputCreate(KEY_F4_GPIO, KEY_F4_BIT, false);
+    board.decrement = DigitalInputCreate(KEY_F4_GPIO, KEY_F4_BIT, false);
 
     Chip_SCU_PinMuxSet(KEY_ACCEPT_PORT, KEY_ACCEPT_PIN, SCU_MODE_INBUFF_EN | SCU_MODE_PULLUP | KEY_ACCEPT_FUNC);
     board.accept = DigitalInputCreate(KEY_ACCEPT_GPIO, KEY_ACCEPT_BIT, false);
@@ -160,14 +160,16 @@ void displayInit(void){
 void clearScreen(void){
     Chip_GPIO_ClearValue(LPC_GPIO_PORT, DIGITS_GPIO, DIGITS_MASK);
     Chip_GPIO_ClearValue(LPC_GPIO_PORT, SEGMENTS_GPIO, SEGMENTS_MASK);
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, false);
 };
 
 void WriteNumber(uint8_t number){
-    Chip_GPIO_SetValue(LPC_GPIO_PORT, SEGMENTS_GPIO, number);
+    Chip_GPIO_SetValue(LPC_GPIO_PORT, SEGMENTS_GPIO, (number)&SEGMENTS_MASK);
+    Chip_GPIO_SetPinState(LPC_GPIO_PORT, SEGMENT_P_GPIO, SEGMENT_P_BIT, (number & SEGMENT_P));
 };
 
 void SelectDigit(uint8_t digit){
-    Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO, (1 << digit));
+    Chip_GPIO_SetValue(LPC_GPIO_PORT, DIGITS_GPIO, (1 << (3 -digit)) & DIGITS_MASK);
 };
 
 
@@ -181,6 +183,19 @@ board_t BoardCreate(void)
     displayInit();
 
     return &board;
+}
+
+void SisTick_Init(uint16_t ticks) {
+    __asm volatile("cpsid i"); //Deshabilita las interrupciones
+
+    /* Activate Systick*/
+    SystemCoreClockUpdate();
+    SysTick_Config(SystemCoreClock/ticks);
+
+    /* Update priority set by SysTick_Config */
+    NVIC_SetPriority(SysTick_IRQn, (1 <<__NVIC_PRIO_BITS) - 1);
+
+    __asm volatile("cpsie i"); //Habilita las interrupciones
 }
 /* === End of documentation ==================================================================== */
 
